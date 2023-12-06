@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 import AuthHeader from "../../shared/components/AuthHeader";
 import CustomInputSingup from "../../shared/components/ui/CustomInputSignup";
 import CustomButton from "../../shared/components/ui/CustomButton";
 import axios from "axios";
-import Login from './login';
+import Login from "./login";
 
 const isValidEmail = (email) => {
   // Should contain @
@@ -26,6 +27,8 @@ const isValidConfirmPassword = (password, confirmPassword) => {
 const formIsValid = (DataObj) => {
   return (
     Object.values(DataObj).every((value) => value.trim().length > 0) &&
+    isValidEmail(DataObj.code) &&
+    isValidEmail(DataObj.email) &&
     isValidPassword(DataObj.password) &&
     DataObj.password === DataObj.confirmPassword
   );
@@ -35,8 +38,8 @@ const ResetPassword = () => {
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-  const navigation = useNavigation(); 
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigation = useNavigation();
   const [formErrors, setFormErrors] = useState({
     email: null,
     code: null,
@@ -48,6 +51,7 @@ const ResetPassword = () => {
     code: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -83,14 +87,39 @@ const ResetPassword = () => {
       }, 3000); // 3000 milliseconds = 3 seconds
     }
   };
-  const isValidForm = () => {
-    if (!formIsValid(formData)) {
-      updateError(
-        "email",
-        !isValidEmail(formData.email) ? "Invalid email" : null
-      );
-    }
-  };
+const isValidForm = () => {
+  if (!formIsValid(formData.firstName)) {
+    updateError(
+      "code",
+      !isValidfirstName(formData.firstName)
+        ? "code is invalid"
+        : null
+    );
+  }
+  if (!formIsValid(formData)) {
+    updateError(
+      "email",
+      !isValidEmail(formData.email) ? "Invalid email" : null
+    );
+  }
+  if (!formIsValid(formData.password)) {
+    updateError(
+      "Password",
+      !isValidConfirmPassword(formData.password, formData.Password)
+        ? "Passwords do not match"
+        : null
+    );
+  }
+  if (!formIsValid(formData.confirmPassword)) {
+    updateError(
+      "confirmPassword",
+      !isValidConfirmPassword(formData.password, formData.confirmPassword)
+        ? "Passwords do not match"
+        : null
+    );
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,66 +128,66 @@ const ResetPassword = () => {
       code: code,
       email: email,
       password: password,
+      confirmPassword: confirmPassword,
     });
 
-    if (!formIsValid(formData)) {
-      updateError("code", !isValidEmail(formData.code) ? "Invalid code" : null);
-      updateError(
+    if (!formIsValid(code, email, password, confirmPassword)) {
+      Toast.show({
+        type: "error",
+        position: "bottom",
+        text1: "Please review your credentials",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+       updateError(
+        "code",
+        !isValidEmail(formData.code) ? "Invalid code" : null
+      );
+       updateError(
         "email",
         !isValidEmail(formData.email) ? "Invalid email" : null
       );
-      updateError(
+     updateError(
         "password",
         !isValidPassword(formData.password)
           ? "Password = min 8 char with 1 cap , 1 number,1 special char"
           : null
       );
-   updateError(
-     "confirmPassword",
-     !isValidConfirmPassword(formData.password, formData.confirmPassword)
-       ? "Passwords do not match"
-       : null
-   );
+       updateError(
+        "confirmPassword",
+        !isValidConfirmPassword(formData.password, formData.confirmPassword)
+          ? "Passwords do not match"
+          : null
+      );
       /* for debogue console.warn("Invalid Form"); */
-        Toast.show({
-             type: "success",
-             position: "bottom",
-             text1: "Invalid Form",
-             visibilityTime: 3000,
-             autoHide: true,
-           });
     }
     try {
-      const response = await axios.post(
-        "http://localhost:5555/api/users/password",
-        {
-          code: formData.code, // Include the code in the request
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-        }
-      );
-
-      // Navigate to Login screen
-    /* for debug  console.warn("Password reset successfully");"); */
-           Toast.show({
-             type: "success",
-             position: "bottom",
-             text1: "Password reset successfully",
-             visibilityTime: 3000,
-             autoHide: true,
-           });
-            navigation.navigate("Login");
-    }
-      catch (err) {
-      console.log("Request error:", err.message);
-     /* for debug console.warn("Password reset failed"); */
-           Toast.show({
-             type: "success",
-             position: "bottom",
-             text1: "Reset Password failed",
-             visibilityTime: 3000,
-             autoHide: true,
-           });
+         const response = await axios.post(
+        "http://localhost:5555/api/user/password",
+        formData
+         );
+         console.log(response.data);
+         Toast.show({
+           type: "success",
+           position: "bottom",
+           text1: "password reset successfully",
+           visibilityTime: 3000,
+           autoHide: true,
+         });
+    setTimeout(() => {
+        navigation.navigate("Login");
+      }, 3000); 
+  
+    } catch (err) {
+      console.log(err.response.data.message);
+      /* for debug console.warn("Password reset failed"); */
+      Toast.show({
+        type: "error",
+        position: "bottom",
+        text1: err.response.data.message,
+        visibilityTime: 3000,
+        autoHide: true,
+      });
     }
   };
 
@@ -208,7 +237,7 @@ const ResetPassword = () => {
         />
         {/* Button End */}
       </View>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast />
     </View>
   );
 };
