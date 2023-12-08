@@ -1,6 +1,6 @@
 import User from "../models/userModel.js";
 import matchPassword from "../utils/matchPassword.js";
-
+import bcrypt from "bcrypt";
 const authMiddleware = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -8,14 +8,21 @@ const authMiddleware = async (req, res, next) => {
     return res.status(400).send("Parameters missing in the body");
   }
 
+  // Find user by email
   const user = await User.findOne({ email });
 
-  if (user && (await matchPassword(password, user))) {
-    req.user = user;
-    next();
-  } else {
-    return res.status(400).send("There was a problem with your data!!!");
+  if (!user) {
+    return res.status(400).send("Email does not exist");
   }
+
+  // Check if password matches
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Password not match" });
+  }
+
+  req.user = user;
+  next();
 };
 
 export default authMiddleware;
