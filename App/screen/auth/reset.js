@@ -83,37 +83,36 @@ const ResetLogin = () => {
     });
 
     if (!formIsValid(formData)) {
-          Toast.show({
-            type: "error",
-            position: "bottom",
-            text1: "Please review your credentials",
-            visibilityTime: 3000,
-            autoHide: true,
-          }); 
+      Toast.show({
+        type: "error",
+        position: "bottom",
+        text1: "Please review your credentials",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
       return updateError(
         "email",
         !isValidEmail(formData.email) ? "Invalid email" : null
       );
-
     }
     try {
-         const response = await axios.post(
+      const response = await axios.post(
         `http://localhost:5555/api/user/reset`,
         formData
       );
       console.log(response.data);
-         Toast.show({
-           type: "success",
-           position: "bottom",
-           text1: "Check your email to reset your password",
-           visibilityTime: 3000,
-           autoHide: true,
-         });
+      Toast.show({
+        type: "success",
+        position: "bottom",
+        text1: "Check your email to reset your password",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
       setTimeout(() => {
         navigation.navigate("ResetPassword"); // Navigation après 3 secondes
       }, 3000); // Délai de 3000 millisecondes (3 secondes)
     } catch (err) {
-      console.log(err.response.data.message);
+      console.log("Test signup", err.response.data.message);
       Toast.show({
         type: "error",
         position: "bottom",
@@ -144,7 +143,7 @@ const ResetLogin = () => {
           buttonText={"Reset password"}
         />
       </View>
-    <Toast/>
+      <Toast />
     </View>
   );
 };
