@@ -57,27 +57,34 @@ const registerUser = async (req, res, next) => {
 
     // check if the name, email and password are not empty
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-  
       return res.status(400).json({ message: "Please fill all the fields" });
-    }
-    // check if the password is === confirmPassword 
-     if (password !== confirmPassword) {
-       return res.status(400).json({ message: "Confirm Password not match with Password" });
-     }
-     console.log('third check')
-    // validate the email
-    if (!validator.isEmail(email)) {
-        return res.status(401).json({ message: "Email is not valid " });
     }
 
     // check if the email is valid
     const userExists = await User.findOne({ email });
 
-    console.log('user exists', userExists)
+    console.log("user exists", userExists);
     // check if the email is already in use
     if (userExists) {
       return res.status(400).json({ message: "Email already in use" });
     }
+    // check if the password is === confirmPassword
+    if (password !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ message: "Password not match with Password" });
+    }
+    console.log("third check");
+    // validate the email
+    if (!validator.isEmail(email)) {
+      return res.status(401).json({ message: "Email is not valid " });
+    }
+
+    // check if the email is already in use
+    if (userExists) {
+      return res.status(400).json({ message: "Email already in use" });
+    }
+
     // create a new user object for the user that wants to register
     const user = new User({ firstName, lastName, email, password });
 
