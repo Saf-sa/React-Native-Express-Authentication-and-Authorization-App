@@ -87,39 +87,36 @@ const ResetPassword = () => {
       }, 3000); // 3000 milliseconds = 3 seconds
     }
   };
-const isValidForm = () => {
-  if (!formIsValid(formData.firstName)) {
-    updateError(
-      "code",
-      !isValidfirstName(formData.firstName)
-        ? "code is invalid"
-        : null
-    );
-  }
-  if (!formIsValid(formData)) {
-    updateError(
-      "email",
-      !isValidEmail(formData.email) ? "Invalid email" : null
-    );
-  }
-  if (!formIsValid(formData.password)) {
-    updateError(
-      "Password",
-      !isValidConfirmPassword(formData.password, formData.Password)
-        ? "Passwords do not match"
-        : null
-    );
-  }
-  if (!formIsValid(formData.confirmPassword)) {
-    updateError(
-      "confirmPassword",
-      !isValidConfirmPassword(formData.password, formData.confirmPassword)
-        ? "Passwords do not match"
-        : null
-    );
-  }
-};
-
+  const isValidForm = () => {
+    if (!formIsValid(formData.firstName)) {
+      updateError(
+        "code",
+        !isValidfirstName(formData.firstName) ? "code is invalid" : null
+      );
+    }
+    if (!formIsValid(formData)) {
+      updateError(
+        "email",
+        !isValidEmail(formData.email) ? "Invalid email" : null
+      );
+    }
+    if (!formIsValid(formData.password)) {
+      updateError(
+        "Password",
+        !isValidConfirmPassword(formData.password, formData.Password)
+          ? "Passwords do not match"
+          : null
+      );
+    }
+    if (!formIsValid(formData.confirmPassword)) {
+      updateError(
+        "confirmPassword",
+        !isValidConfirmPassword(formData.password, formData.confirmPassword)
+          ? "Passwords do not match"
+          : null
+      );
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -139,21 +136,18 @@ const isValidForm = () => {
         visibilityTime: 3000,
         autoHide: true,
       });
-       updateError(
-        "code",
-        !isValidEmail(formData.code) ? "Invalid code" : null
-      );
-       updateError(
+
+      updateError(
         "email",
         !isValidEmail(formData.email) ? "Invalid email" : null
       );
-     updateError(
+      updateError(
         "password",
         !isValidPassword(formData.password)
           ? "Password = min 8 char with 1 cap , 1 number,1 special char"
           : null
       );
-       updateError(
+      updateError(
         "confirmPassword",
         !isValidConfirmPassword(formData.password, formData.confirmPassword)
           ? "Passwords do not match"
@@ -162,22 +156,21 @@ const isValidForm = () => {
       /* for debogue console.warn("Invalid Form"); */
     }
     try {
-         const response = await axios.post(
+      const response = await axios.post(
         "http://localhost:5555/api/user/password",
         formData
-         );
-         console.log(response.data);
-         Toast.show({
-           type: "success",
-           position: "bottom",
-           text1: "password reset successfully",
-           visibilityTime: 3000,
-           autoHide: true,
-         });
-    setTimeout(() => {
+      );
+      console.log(response.data);
+      Toast.show({
+        type: "success",
+        position: "bottom",
+        text1: "password reset successfully",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+      setTimeout(() => {
         navigation.navigate("Login");
-      }, 3000); 
-  
+      }, 3000);
     } catch (err) {
       console.log(err.response.data.message);
       /* for debug console.warn("Password reset failed"); */
